@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Bus | Bus Reservation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand-mark" aria-hidden="true">▤</div>
+    <h1>Bus Reservation System</h1>
+    <p>Keep your bus service information up to date</p>
+</header>
+
+<nav aria-label="Main navigation">
+    <a href="index.html">Home</a>
+    <a href="insert.html">Add Bus</a>
+    <a href="view.html">View Buses</a>
+    <a href="update.html">Update Bus</a>
+    <a href="delete.html">Delete Bus</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <span class="eyebrow">SERVICE MANAGEMENT</span>
+        <h2>Update bus details</h2>
+        <p>Enter the Bus ID and update the details of an existing bus service.</p>
+    </div>
+
+    <section class="panel">
+        <div class="panel-heading">
+            <h2>Bus information</h2>
+            <p>The Bus ID identifies the record you want to update.</p>
+        </div>
+
+        <form id="updateForm">
+
+            <div class="form-group">
+                <label for="bus_id">Bus ID</label>
+                <input
+                    type="number"
+                    id="bus_id"
+                    name="bus_id"
+                    min="1"
+                    placeholder="Enter the existing Bus ID"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="service_number">Service Number</label>
+                <input
+                    type="text"
+                    id="service_number"
+                    name="service_number"
+                    placeholder="e.g. BUS-101"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="starting_place">Starting Place</label>
+                <input
+                    type="text"
+                    id="starting_place"
+                    name="starting_place"
+                    placeholder="Enter starting place"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="destination">Destination</label>
+                <input
+                    type="text"
+                    id="destination"
+                    name="destination"
+                    placeholder="Enter destination"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="departure_date">Departure Date</label>
+                <input
+                    type="date"
+                    id="departure_date"
+                    name="departure_date"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="departure_time">Departure Time</label>
+                <input
+                    type="time"
+                    id="departure_time"
+                    name="departure_time"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="total_seats">Total Seats</label>
+                <input
+                    type="number"
+                    id="total_seats"
+                    name="total_seats"
+                    min="1"
+                    placeholder="Enter total seats"
+                    required
+                >
+            </div>
+
+            <button type="submit">Update Bus Details</button>
+
+            <p id="message" role="status" aria-live="polite"></p>
+
+        </form>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    Bus Reservation System · Bus service management
+</footer>
+
+<script>
+document.getElementById("updateForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById("message");
+    const busId = document.getElementById("bus_id").value.trim();
+
+    const bus = {
+        service_number: document.getElementById("service_number").value.trim(),
+        starting_place: document.getElementById("starting_place").value.trim(),
+        destination: document.getElementById("destination").value.trim(),
+        departure_date: document.getElementById("departure_date").value,
+        departure_time: document.getElementById("departure_time").value,
+        total_seats: document.getElementById("total_seats").value
+    };
+
+    message.textContent = "Updating bus details...";
+
+    try {
+        const response = await fetch("/buses/" + encodeURIComponent(busId), {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bus)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || result.error || "Unable to update bus.");
+        }
+
+        message.textContent = result.message || "Bus details updated successfully!";
+        this.reset();
+
+    } catch (error) {
+        message.textContent = error.message || "Error updating bus. Check the server.";
+    }
+});
+</script>
+
+</body>
+</html>

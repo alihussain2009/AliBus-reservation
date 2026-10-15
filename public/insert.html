@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bus | Bus Reservation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand-mark" aria-hidden="true">＋</div>
+    <h1>Bus Reservation System</h1>
+    <p>Add a new service to your bus directory</p>
+</header>
+
+<nav aria-label="Main navigation">
+    <a href="index.html">Home</a>
+    <a href="insert.html">Add Bus</a>
+    <a href="view.html">View Buses</a>
+    <a href="update.html">Update Bus</a>
+    <a href="delete.html">Delete Bus</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <span class="eyebrow">SERVICE MANAGEMENT</span>
+        <h2>Add a new bus</h2>
+        <p>Enter the service details below to register a bus in your system.</p>
+    </div>
+
+    <section class="panel">
+        <div class="panel-heading">
+            <h2>Bus information</h2>
+            <p>Complete all fields with the correct service and departure details.</p>
+        </div>
+
+        <form id="insertForm">
+
+            <label for="bus_id">Bus ID</label>
+            <input
+                type="number"
+                id="bus_id"
+                min="1"
+                required
+                placeholder="Enter bus ID"
+            >
+
+            <label for="service_number">Service Number</label>
+            <input
+                type="text"
+                id="service_number"
+                required
+                placeholder="e.g. AP-01-102"
+            >
+
+            <label for="starting_place">Starting Place</label>
+            <input
+                type="text"
+                id="starting_place"
+                required
+                placeholder="Enter starting location"
+            >
+
+            <label for="destination">Destination</label>
+            <input
+                type="text"
+                id="destination"
+                required
+                placeholder="Enter destination"
+            >
+
+            <label for="departure_date">Departure Date</label>
+            <input
+                type="date"
+                id="departure_date"
+                required
+            >
+
+            <label for="departure_time">Departure Time</label>
+            <input
+                type="time"
+                id="departure_time"
+                required
+            >
+
+            <label for="total_seats">Total Seats</label>
+            <input
+                type="number"
+                id="total_seats"
+                min="1"
+                required
+                placeholder="Enter total number of seats"
+            >
+
+            <button type="submit">＋ Add Bus to System</button>
+
+        </form>
+
+        <p id="message" role="status" aria-live="polite"></p>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    Bus Reservation System · Bus service management
+</footer>
+
+<script>
+document.getElementById("insertForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const data = {
+        bus_id: Number(document.getElementById("bus_id").value),
+        service_number: document.getElementById("service_number").value,
+        starting_place: document.getElementById("starting_place").value,
+        destination: document.getElementById("destination").value,
+        departure_date: document.getElementById("departure_date").value,
+        departure_time: document.getElementById("departure_time").value,
+        total_seats: Number(document.getElementById("total_seats").value)
+    };
+
+    const message = document.getElementById("message");
+    message.textContent = "Adding bus...";
+
+    try {
+        const response = await fetch("/buses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            message.textContent =
+                result.error || result.message || "Unable to add bus.";
+            return;
+        }
+
+        message.textContent =
+            result.message || "Bus added successfully.";
+
+        this.reset();
+
+    } catch (error) {
+        message.textContent =
+            "Unable to connect to the server. Please check that the server is running.";
+    }
+});
+</script>
+
+</body>
+</html>

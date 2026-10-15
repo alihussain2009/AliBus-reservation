@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Buses | Bus Reservation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand-mark" aria-hidden="true">▤</div>
+    <h1>Bus Reservation System</h1>
+    <p>View and manage your registered bus services</p>
+</header>
+
+<nav aria-label="Main navigation">
+    <a href="index.html">Home</a>
+    <a href="insert.html">Add Bus</a>
+    <a href="view.html">View Buses</a>
+    <a href="update.html">Update Bus</a>
+    <a href="delete.html">Delete Bus</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <span class="eyebrow">SERVICE DIRECTORY</span>
+        <h2>All bus records</h2>
+        <p>View your registered bus services, routes, departure schedules, and total seats.</p>
+    </div>
+
+    <section class="panel">
+
+        <div class="panel-heading">
+            <h2>Bus directory</h2>
+            <p>Records are retrieved from your existing MySQL database.</p>
+        </div>
+
+        <button id="refreshButton" type="button">↻ Refresh Bus Records</button>
+
+        <p id="message" role="status" aria-live="polite"></p>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bus ID</th>
+                        <th>Service Number</th>
+                        <th>Starting Place</th>
+                        <th>Destination</th>
+                        <th>Departure Date</th>
+                        <th>Departure Time</th>
+                        <th>Total Seats</th>
+                    </tr>
+                </thead>
+                <tbody id="busTableBody"></tbody>
+            </table>
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    Bus Reservation System · Bus service management
+</footer>
+
+<script>
+async function loadBuses() {
+    const tbody = document.getElementById("busTableBody");
+    const message = document.getElementById("message");
+
+    message.textContent = "Loading bus records...";
+    tbody.replaceChildren();
+
+    try {
+        const response = await fetch("/buses");
+
+        if (!response.ok) {
+            throw new Error("Failed to retrieve bus records.");
+        }
+
+        const buses = await response.json();
+
+        if (!Array.isArray(buses) || buses.length === 0) {
+            message.textContent = "No bus records found. Add a bus to get started.";
+            return;
+        }
+
+        message.textContent = "";
+
+        buses.forEach(function(bus) {
+            const row = document.createElement("tr");
+
+            [
+                bus.bus_id,
+                bus.service_number,
+                bus.starting_place,
+                bus.destination,
+                bus.departure_date,
+                bus.departure_time,
+                bus.total_seats
+            ].forEach(function(value) {
+                const cell = document.createElement("td");
+                cell.textContent = value ?? "";
+                row.appendChild(cell);
+            });
+
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        message.textContent =
+            "Unable to load bus records. Check your server and database connection.";
+    }
+}
+
+document.getElementById("refreshButton").addEventListener("click", loadBuses);
+
+loadBuses();
+</script>
+
+</body>
+</html>
